@@ -2,6 +2,8 @@ package com.example.studybuddy;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,18 +49,36 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Configurar listener para el adaptador (opcional: manejar clics en items o cambios de estado)
+        // Configurar listener para el adaptador
         adapter.setOnItemClickListener(new TaskAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Task task) {
-                // Acción al hacer clic en una tarea (puede ser editarla, por ejemplo)
-                // Por ahora, puedes dejarlo vacío o mostrar un Toast
+                // *** NUEVO: Acción al hacer clic en una tarea -> Editar ***
+                Intent intent = new Intent(MainActivity.this, AddTaskActivity.class);
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_ID, task.getId());
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_TITLE, task.getTitle());
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_DESCRIPTION, task.getDescription());
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_DATE, task.getDate());
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_TIME, task.getTime());
+                // intent.putExtra(AddTaskActivity.EXTRA_TASK_COMPLETED, task.isCompleted()); // Opcional
+                startActivity(intent);
             }
 
             @Override
             public void onTaskStatusChanged(Task task, boolean isCompleted) {
-                // Actualizar el estado de completado de la tarea
                 task.setCompleted(isCompleted);
-                taskViewModel.update(task); // Guardar el cambio
+                taskViewModel.update(task);
+            }
+
+            @Override
+            public void onTaskDelete(Task task) {
+                taskViewModel.delete(task);
+                Toast.makeText(MainActivity.this, "Tarea eliminada", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onTaskEdit(Task task) {
+
             }
         });
     }

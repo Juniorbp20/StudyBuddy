@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,6 +64,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
         private TextView textViewDate;
         private TextView textViewTime;
         private CheckBox checkBoxCompleted;
+        private ImageButton buttonDelete; // *** NUEVO ***
 
         public TaskHolder(View itemView) {
             super(itemView);
@@ -70,8 +72,9 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
             textViewDate = itemView.findViewById(R.id.text_view_task_date);
             textViewTime = itemView.findViewById(R.id.text_view_task_time);
             checkBoxCompleted = itemView.findViewById(R.id.checkbox_task_completed);
+            buttonDelete = itemView.findViewById(R.id.button_delete_task); // *** NUEVO ***
 
-            // Manejar clic en el item (opcional)
+            // Manejar clic en el item (opcional, por ejemplo para editar)
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
@@ -83,10 +86,17 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
             checkBoxCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION) {
-                    // Notificar al listener del cambio de estado
                     if (listener != null) {
                         listener.onTaskStatusChanged(tasks.get(position), isChecked);
                     }
+                }
+            });
+
+            // *** NUEVO: Manejar clic en el botón de eliminar ***
+            buttonDelete.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+                    listener.onTaskDelete(tasks.get(position)); // Llama al listener
                 }
             });
         }
@@ -96,6 +106,8 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskHolder> {
     public interface OnItemClickListener {
         void onItemClick(Task task);
         void onTaskStatusChanged(Task task, boolean isCompleted);
+        void onTaskDelete(Task task);
+        void onTaskEdit(Task task);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

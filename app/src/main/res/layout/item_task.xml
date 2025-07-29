@@ -32,9 +32,9 @@
             android:textStyle="bold"
             android:maxLines="1"
             android:ellipsize="end"
-            app:layout_constraintEnd_toStartOf="@+id/text_view_task_time"
-            app:layout_constraintStart_toEndOf="@+id/checkbox_task_completed"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/button_delete_task"
+        app:layout_constraintStart_toEndOf="@+id/checkbox_task_completed"
+        app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/text_view_task_date"
@@ -44,9 +44,9 @@
             android:layout_marginTop="4dp"
             android:text="Fecha"
             android:textSize="14sp"
-            app:layout_constraintEnd_toStartOf="@+id/text_view_task_time"
-            app:layout_constraintStart_toEndOf="@+id/checkbox_task_completed"
-            app:layout_constraintTop_toBottomOf="@+id/text_view_task_title" />
+            app:layout_constraintEnd_toStartOf="@+id/button_delete_task"
+        app:layout_constraintStart_toEndOf="@+id/checkbox_task_completed"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_task_title" />
 
         <TextView
             android:id="@+id/text_view_task_time"
@@ -55,9 +55,22 @@
             android:text="Hora"
             android:textSize="14sp"
             android:textStyle="italic"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintEnd_toStartOf="@+id/button_delete_task"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- *** NUEVO: Botón de Eliminar *** -->
+        <ImageButton
+            android:id="@+id/button_delete_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:contentDescription="Eliminar tarea"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
