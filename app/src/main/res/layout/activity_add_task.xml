@@ -23,7 +23,6 @@
         android:id="@+id/text_view_add_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Agregar Tarea"
     android:textColor="@android:color/white"
     android:textSize="20sp"
     android:padding="16dp"
