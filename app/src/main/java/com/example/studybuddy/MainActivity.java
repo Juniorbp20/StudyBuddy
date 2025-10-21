@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.studybuddy.notification.AlarmManagerHelper;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import adapter.TaskAdapter;
 import model.Task;
@@ -60,19 +61,28 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(AddTaskActivity.EXTRA_TASK_DESCRIPTION, task.getDescription());
                 intent.putExtra(AddTaskActivity.EXTRA_TASK_DATE, task.getDate());
                 intent.putExtra(AddTaskActivity.EXTRA_TASK_TIME, task.getTime());
-                // intent.putExtra(AddTaskActivity.EXTRA_TASK_COMPLETED, task.isCompleted()); // Opcional
+                intent.putExtra(AddTaskActivity.EXTRA_TASK_COMPLETED, task.isCompleted());
                 startActivity(intent);
-            }
+                }
 
             @Override
             public void onTaskStatusChanged(Task task, boolean isCompleted) {
                 task.setCompleted(isCompleted);
                 taskViewModel.update(task);
+                // Opcional: Si una tarea completada no necesita recordatorio, cancelar alarma
+                if (isCompleted) {
+                    // *** USO DE ALARM MANAGER HELPER PARA CANCELAR ALARMA ***
+                    AlarmManagerHelper alarmManagerHelper = new AlarmManagerHelper((TaskAdapter.OnItemClickListener) MainActivity.this);
+                    alarmManagerHelper.cancelAlarm(task.getId());
+                }
             }
 
             @Override
             public void onTaskDelete(Task task) {
                 taskViewModel.delete(task);
+                // *** USO DE ALARM MANAGER HELPER PARA CANCELAR ALARMA CUANDO SE ELIMINA ***
+                AlarmManagerHelper alarmManagerHelper = new AlarmManagerHelper((TaskAdapter.OnItemClickListener) MainActivity.this);
+                alarmManagerHelper.cancelAlarm(task.getId());
                 Toast.makeText(MainActivity.this, "Tarea eliminada", Toast.LENGTH_SHORT).show();
             }
 

@@ -25,15 +25,7 @@
             app:collapsedTitleTextAppearance="@style/TextAppearance.AppCompat.Title"
             app:layout_scrollFlags="scroll|enterAlways">
 
-            <TextView
-                android:id="@+id/text_view_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="16dp"
-                android:textColor="@android:color/white"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 

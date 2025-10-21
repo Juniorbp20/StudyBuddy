@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.textfield.TextInputEditText;
 
+import com.example.studybuddy.notification.AlarmManagerHelper; // *** Importación para la alarma ***
+
+import adapter.TaskAdapter;
 import model.Task;
 import viewmodel.TaskViewModel;
 import java.text.ParseException;
@@ -27,6 +31,7 @@ public class AddTaskActivity extends AppCompatActivity {
     public static final String EXTRA_TASK_DESCRIPTION = "extra_task_description";
     public static final String EXTRA_TASK_DATE = "extra_task_date";
     public static final String EXTRA_TASK_TIME = "extra_task_time";
+    public static final String EXTRA_TASK_COMPLETED = "extra_task_complete";
     private TextInputEditText editTextTitle, editTextDescription;
     private Button buttonSelectDate, buttonSelectTime, buttonSaveTask;
     private TextView textViewSelectedDate, textViewSelectedTime, textViewAddTitle;
@@ -175,21 +180,92 @@ public class AddTaskActivity extends AppCompatActivity {
             return;
         }
 
-        if (isEditing) {
-            // Actualizar tarea existente
-            // Creamos un objeto Task con el ID existente
-            Task taskToUpdate = new Task(title, description, date, time, false); // isCompleted se maneja por separado
-            taskToUpdate.setId(taskId); // *** Muy importante ***
-            taskViewModel.update(taskToUpdate);
-            Toast.makeText(this, "Tarea actualizada", Toast.LENGTH_SHORT).show();
-        } else {
-            // Crear nueva tarea
-            Task newTask = new Task(title, description, date, time, false);
-            taskViewModel.insert(newTask);
-            Toast.makeText(this, "Tarea guardada", Toast.LENGTH_SHORT).show();
+        // *** VERIFICAR SI LA FECHA Y HORA ESTÁN VACÍAS ***
+        if (date.isEmpty() || time.isEmpty()) {
+            Toast.makeText(this, "Por favor, seleccione una fecha y hora válidas", Toast.LENGTH_SHORT).show();
+            return; // No continuar si falta fecha/hora
         }
 
-        // Finalizar la actividad para volver a MainActivity
+        // *** INICIO: LÓGICA PARA DETERMINAR SI ES EDICIÓN O NUEVA TAREA ***
+        if (isEditing) {
+            // *** ESCENARIO: Editar tarea existente ***
+            Task taskToUpdate = new Task(title, description, date, time, false);
+            taskToUpdate.setId(taskId);
+            taskViewModel.update(taskToUpdate);
+
+            // *** ALARMA: Reprogramar la alarma para la tarea actualizada ***
+            // Llamamos al método auxiliar
+            scheduleAlarmForTask(taskToUpdate, date, time);
+
+            Toast.makeText(this, "Tarea actualizada", Toast.LENGTH_SHORT).show();
+        } else {
+            // *** ESCENARIO: Crear nueva tarea ***
+            Task newTask = new Task(title, description, date, time, false);
+            taskViewModel.insert(newTask);
+
+            // *** ALARMA: Programar la alarma para la nueva tarea ***
+            // Llamamos al método auxiliar
+            scheduleAlarmForTask(newTask, date, time);
+
+            Toast.makeText(this, "Tarea guardada", Toast.LENGTH_SHORT).show();
+        }
+        // *** FIN: LÓGICA DE GUARDADO Y ALARMA ***
+
         finish();
+    }
+
+    // *** MÉTODO AUXILIAR PARA PROGRAMAR LA ALARMA ***
+    /**
+     * Programa una alarma para una tarea específica usando AlarmManagerHelper.
+     * @param task El objeto Task (debe tener un ID asignado si es nueva, o el ID existente si es editada).
+     * @param dateString La fecha en formato String (esperado "yyyy-MM-dd").
+     * @param timeString La hora en formato String (esperado "HH:mm").
+     */
+    private void scheduleAlarmForTask(Task task, String dateString, String timeString) {
+        try {
+            // *** PARSEAR FECHA Y HORA ***
+            // Asumiendo formato "yyyy-MM-dd" para date y "HH:mm" para time
+            String[] dateParts = dateString.split("-");
+            int year = Integer.parseInt(dateParts[0]);
+            // ¡OJO! Los meses en Calendar van de 0 (Enero) a 11 (Diciembre)
+            int month = Integer.parseInt(dateParts[1]) - 1;
+            int day = Integer.parseInt(dateParts[2]);
+
+            String[] timeParts = timeString.split(":");
+            int hour = Integer.parseInt(timeParts[0]);
+            int minute = Integer.parseInt(timeParts[1]);
+
+            // Validar rangos razonables
+            if (year < 2000 || year > 2100 || month < 0 || month > 11 || day < 1 || day > 31 ||
+                    hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+                throw new IllegalArgumentException("Fecha/Hora fuera de rango válido");
+            }
+
+            // *** USO DE ALARM MANAGER HELPER PARA PROGRAMAR LA ALARMA ***
+            AlarmManagerHelper alarmManagerHelper = new AlarmManagerHelper((TaskAdapter.OnItemClickListener) AddTaskActivity.this);
+            alarmManagerHelper.setAlarm(
+                    task.getId(),
+                    task.getTitle(),
+                    task.getDescription(),
+                    year,
+                    month,
+                    day,
+                    hour,
+                    minute
+            );
+
+        } catch (NumberFormatException e) {
+            // Manejar errores de parsing (formato incorrecto, valores no numéricos)
+            Log.e("AddTaskActivity", "Error al parsear fecha/hora: " + e.getMessage());
+            Toast.makeText(this, "Error al programar recordatorio: Fecha/Hora inválida", Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            // Manejar errores de rango
+            Log.e("AddTaskActivity", "Error al validar fecha/hora: " + e.getMessage());
+            Toast.makeText(this, "Error al programar recordatorio: Fecha/Hora inválida", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            // Capturar otros errores inesperados
+            Log.e("AddTaskActivity", "Error inesperado al programar alarma: " + e.getMessage());
+            Toast.makeText(this, "Error al programar recordatorio: Fecha/Hora inválida", Toast.LENGTH_SHORT).show();
+        }
     }
 }
