@@ -2,6 +2,7 @@ package com.example.studybuddy
 
 import android.Manifest
 import android.app.ActivityOptions
+import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -37,7 +38,9 @@ import com.example.studybuddy.notification.DailyOverdueWorker
 import com.example.studybuddy.ui.TaskViewModel
 import com.example.studybuddy.util.BackupHelper
 import com.example.studybuddy.util.ExportImportHelper
+import com.example.studybuddy.util.UpdateChecker
 import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.launch
@@ -405,6 +408,82 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
         }.show()
     }
 
+    private fun checkForUpdates() {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.update_checking_title)
+            .setMessage(R.string.update_checking)
+            .setCancelable(false)
+            .show()
+        lifecycleScope.launch {
+            val info = UpdateChecker.checkLatest(this@MainActivity)
+            dialog.dismiss()
+            if (info == null || info.apkUrl.isBlank()) {
+                Toast.makeText(
+                    this@MainActivity, R.string.update_check_error, Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+            if (!UpdateChecker.isUpdateAvailable(BuildConfig.VERSION_CODE, info)) {
+                Toast.makeText(
+                    this@MainActivity, R.string.update_latest, Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle(R.string.update_available_title)
+                .setMessage(
+                    getString(
+                        R.string.update_available_message,
+                        info.versionName,
+                        BuildConfig.VERSION_NAME
+                    )
+                )
+                .setPositiveButton(R.string.update_download) { _, _ ->
+                    downloadAndInstall(info.apkUrl)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun downloadAndInstall(url: String) {
+        val progressDialog = ProgressDialog(this).apply {
+            setTitle(R.string.update_downloading)
+            setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+            setCancelable(false)
+        }
+        progressDialog.show()
+        lifecycleScope.launch {
+            val file = UpdateChecker.downloadApk(this@MainActivity, url) { downloaded, total ->
+                if (total > 0) {
+                    progressDialog.max = total
+                    progressDialog.progress = downloaded
+                } else {
+                    progressDialog.isIndeterminate = true
+                }
+            }
+            progressDialog.dismiss()
+            if (file == null) {
+                Toast.makeText(
+                    this@MainActivity, R.string.update_download_error, Toast.LENGTH_SHORT
+                ).show()
+                return@launch
+            }
+            if (!UpdateChecker.canInstall(this@MainActivity)) {
+                MaterialAlertDialogBuilder(this@MainActivity)
+                    .setTitle(R.string.update_install_permission_title)
+                    .setMessage(R.string.update_install_permission_message)
+                    .setPositiveButton(R.string.update_install_permission_action) { _, _ ->
+                        UpdateChecker.openInstallPermissionSettings(this@MainActivity)
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+                return@launch
+            }
+            UpdateChecker.installApk(this@MainActivity, file)
+        }
+    }
+
     private fun showExportResult(success: Boolean, count: Int) {
         Toast.makeText(
             this,
@@ -442,6 +521,10 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
             }
             R.id.action_import -> {
                 importLauncher.launch(arrayOf("application/json", "text/*"))
+                true
+            }
+            R.id.action_check_update -> {
+                checkForUpdates()
                 true
             }
             R.id.action_theme_system -> {

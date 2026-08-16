@@ -37,6 +37,21 @@
     <string name="menu_theme_light">Light</string>
     <string name="menu_theme_dark">Dark</string>
 
+    <!-- Updates -->
+    <string name="menu_check_update">Check for updates</string>
+    <string name="update_checking_title">Checking for updates</string>
+    <string name="update_checking">Checking the latest available version…</string>
+    <string name="update_check_error">Could not check for the latest version</string>
+    <string name="update_latest">You already have the latest version</string>
+    <string name="update_available_title">New version available</string>
+    <string name="update_available_message">Version %1$s is available (you have %2$s). Download and install?</string>
+    <string name="update_download">Download</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_download_error">Could not download the update</string>
+    <string name="update_install_permission_title">Install unknown apps</string>
+    <string name="update_install_permission_message">To install the update, allow Study Buddy to install applications.</string>
+    <string name="update_install_permission_action">Open settings</string>
+
     <!-- Add/Edit task -->
     <string name="add_task_title">Add Task</string>
     <string name="edit_task_title">Edit Task</string>

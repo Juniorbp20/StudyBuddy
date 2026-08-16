@@ -37,6 +37,21 @@
     <string name="menu_theme_light">Claro</string>
     <string name="menu_theme_dark">Oscuro</string>
 
+    <!-- Actualizaciones -->
+    <string name="menu_check_update">Buscar actualizaciones</string>
+    <string name="update_checking_title">Buscando actualizaciones</string>
+    <string name="update_checking">Comprobando la última versión disponible…</string>
+    <string name="update_check_error">No se pudo comprobar la última versión</string>
+    <string name="update_latest">Ya tienes la última versión</string>
+    <string name="update_available_title">Nueva versión disponible</string>
+    <string name="update_available_message">Hay disponible la versión %1$s (tienes la %2$s). ¿Descargar e instalar?</string>
+    <string name="update_download">Descargar</string>
+    <string name="update_downloading">Descargando actualización…</string>
+    <string name="update_download_error">No se pudo descargar la actualización</string>
+    <string name="update_install_permission_title">Instalar desde orígenes desconocidos</string>
+    <string name="update_install_permission_message">Para instalar la actualización, permite a Study Buddy instalar aplicaciones.</string>
+    <string name="update_install_permission_action">Abrir ajustes</string>
+
     <!-- Add/Edit task -->
     <string name="add_task_title">Agregar Tarea</string>
     <string name="edit_task_title">Editar Tarea</string>

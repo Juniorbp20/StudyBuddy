@@ -19,6 +19,7 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 - **Exportar/importar** tareas en JSON y CSV.
 - **Tema oscuro y Material You** (colores dinámicos en Android 12+), tema claro/oscuro/sistema desde el menú.
 - **Deshacer** al eliminar tareas (snackbar).
+- **Actualizaciones desde GitHub Releases**: menú → "Buscar actualizaciones" compara la versión instalada con la última release del CD y descarga/instala el APK (requiere permiso "instalar desde orígenes desconocidos").
 - **Multilingüe**: español (es) e inglés (en).
 
 ## Tecnologías
@@ -67,9 +68,16 @@ app/src/main/java/com/example/studybuddy/
 
 Los tests de migración validan las rutas v1→v4, v2→v4 y v3→v4 usando los esquemas exportados en `app/schemas/`.
 
-## CI
+## CI / CD
 
-`.github/workflows/android.yml` ejecuta en cada push/PR a `main`/`master`: tests unitarios, lint y build del APK (subido como artefacto).
+- `.github/workflows/android.yml` — CI en cada push/PR a `main`/`master`: tests unitarios, lint y build del APK (subido como artefacto).
+- `.github/workflows/cd.yml` — CD al publicar un tag `v*` (o manual): tests, lint, build del APK de release y publicación de una GitHub Release con el APK adjunto.
+
+### Publicar una versión
+
+1. Sube el `versionCode` y `versionName` en `app/build.gradle.kts`.
+2. Crea y sube un tag con el mismo número: `git tag v5 && git push origin v5`.
+3. El CD genera la release; la app la detecta en "Buscar actualizaciones" (el APK de release se firma con el keystore de debug).
 
 ## Licencia
 

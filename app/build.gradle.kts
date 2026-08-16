@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.studybuddy"
         minSdk = 23
         targetSdk = 36
-        versionCode = 2
-        versionName = "2.0"
+        versionCode = 4
+        versionName = "4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -25,6 +25,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -36,6 +37,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
