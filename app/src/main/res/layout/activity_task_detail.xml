@@ -62,14 +62,25 @@
                 app:layout_constraintTop_toBottomOf="@+id/text_description"
                 tools:text="Fecha" />
 
+            <ImageView
+                android:id="@+id/image_category"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="8dp"
+                android:contentDescription="Categoría"
+                android:src="@drawable/ic_cat_star"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_date" />
+
             <TextView
                 android:id="@+id/text_category"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/image_category"
                 app:layout_constraintTop_toBottomOf="@+id/text_date"
                 tools:text="Categoría" />
 

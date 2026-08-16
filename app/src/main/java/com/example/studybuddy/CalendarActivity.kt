@@ -36,6 +36,9 @@ class CalendarActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
         adapter = TaskAdapter(this)
         binding.recyclerViewDayTasks.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewDayTasks.adapter = adapter
+        taskViewModel.categories.observe(this) { categories ->
+            adapter.updateCategories(categories)
+        }
 
         updateMonthTitle()
         binding.monthCalendar.setMonth(currentMonth)

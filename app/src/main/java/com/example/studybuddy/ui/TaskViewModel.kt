@@ -7,6 +7,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.studybuddy.data.ServiceLocator
 import com.example.studybuddy.data.TaskRepository
+import com.example.studybuddy.model.CategoryEntity
 import com.example.studybuddy.model.DayCount
 import com.example.studybuddy.model.SubTask
 import com.example.studybuddy.model.Task
@@ -22,12 +23,12 @@ import kotlinx.coroutines.launch
 
 data class TaskFilter(
     val query: String? = null,
-    val category: String? = null,
+    val category: Int? = null,
     val priority: Int? = null,
     val tag: String? = null
 ) {
     val isActive: Boolean
-        get() = !query.isNullOrBlank() || !category.isNullOrBlank() ||
+        get() = !query.isNullOrBlank() || category != null ||
             priority != null || !tag.isNullOrBlank()
 }
 
@@ -36,7 +37,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: TaskRepository = ServiceLocator.getRepository(application)
 
     private val _searchQuery = MutableStateFlow<String?>(null)
-    private val _categoryFilter = MutableStateFlow<String?>(null)
+    private val _categoryFilter = MutableStateFlow<Int?>(null)
     private val _priorityFilter = MutableStateFlow<Int?>(null)
     private val _tagFilter = MutableStateFlow<String?>(null)
 
@@ -51,6 +52,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     val totalCount: LiveData<Int> = repository.totalCount.asLiveData()
     val completedCount: LiveData<Int> = repository.completedCount.asLiveData()
     val pendingCount: LiveData<Int> = repository.pendingCount.asLiveData()
+    val categories: LiveData<List<CategoryEntity>> = repository.categories.asLiveData()
 
     val overdueCount: LiveData<Int> = ticker.flatMapLatest { now ->
         repository.overdueCount(now)
@@ -101,7 +103,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         _searchQuery.value = query
     }
 
-    fun setCategoryFilter(category: String?) {
+    fun setCategoryFilter(category: Int?) {
         _categoryFilter.value = category
     }
 
@@ -150,6 +152,22 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteSubTask(subTask: SubTask) {
         viewModelScope.launch {
             repository.deleteSubTask(subTask)
+        }
+    }
+
+    fun upsertCategory(category: CategoryEntity, onDone: (Int) -> Unit = {}) {
+        viewModelScope.launch {
+            val id = repository.upsertCategory(category)
+            onDone(id)
+        }
+    }
+
+    suspend fun upsertCategoryNow(category: CategoryEntity): Int =
+        repository.upsertCategory(category)
+
+    fun deleteCategory(category: CategoryEntity) {
+        viewModelScope.launch {
+            repository.deleteCategory(category)
         }
     }
 }

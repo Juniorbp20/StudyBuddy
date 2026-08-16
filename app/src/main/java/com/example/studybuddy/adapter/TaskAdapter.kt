@@ -10,13 +10,23 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.studybuddy.R
 import com.example.studybuddy.databinding.ItemTaskBinding
+import com.example.studybuddy.model.CategoryEntity
 import com.example.studybuddy.model.Priority
 import com.example.studybuddy.model.Task
+import com.example.studybuddy.model.categoryIconRes
 import com.example.studybuddy.util.DateUtils
 
 class TaskAdapter(
     private val listener: OnItemClickListener
 ) : ListAdapter<Task, TaskAdapter.TaskHolder>(DIFF_CALLBACK) {
+
+    private val categories = mutableMapOf<Int, CategoryEntity>()
+
+    fun updateCategories(list: List<CategoryEntity>) {
+        categories.clear()
+        list.forEach { categories[it.id] = it }
+        notifyDataSetChanged()
+    }
 
     interface OnItemClickListener {
         fun onItemClick(task: Task)
@@ -44,7 +54,11 @@ class TaskAdapter(
             binding.textViewTaskTime.text = DateUtils.formatTime(task.dueDate)
             binding.checkboxTaskCompleted.isChecked = task.isCompleted
 
-            binding.viewCategoryColor.setBackgroundColor(categoryColor(task.category))
+            val category = categories[task.categoryId]
+            val iconRes = category?.icon?.categoryIconRes()
+                ?: R.drawable.ic_cat_star
+            binding.imageCategory.setImageResource(iconRes)
+            binding.imageCategory.setColorFilter(categoryColor(task.categoryId))
             binding.imagePriority.setColorFilter(priorityColor(task.priority))
 
             val completed = task.isCompleted
@@ -66,11 +80,9 @@ class TaskAdapter(
         }
     }
 
-    private fun categoryColor(category: String): Int = when (category) {
-        "STUDY" -> Color.parseColor("#3F51B5")
-        "WORK" -> Color.parseColor("#F57C00")
-        "PERSONAL" -> Color.parseColor("#00897B")
-        else -> Color.parseColor("#9E9E9E")
+    private fun categoryColor(categoryId: Int): Int {
+        val category = categories[categoryId]
+        return category?.color ?: CategoryEntity.DEFAULT_COLOR
     }
 
     private fun priorityColor(priority: Int): Int = when (priority) {

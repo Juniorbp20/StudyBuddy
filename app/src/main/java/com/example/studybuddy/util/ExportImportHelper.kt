@@ -2,6 +2,7 @@ package com.example.studybuddy.util
 
 import android.content.Context
 import android.net.Uri
+import com.example.studybuddy.model.CategoryEntity
 import com.example.studybuddy.model.Task
 import org.json.JSONArray
 import org.json.JSONObject
@@ -10,8 +11,13 @@ object ExportImportHelper {
 
     private const val MIME_TYPE = "application/json"
 
-    fun exportToJson(tasks: List<Task>): String {
-        val array = JSONArray()
+    data class ImportResult(
+        val tasks: List<Task>,
+        val categories: List<CategoryEntity>
+    )
+
+    fun exportToJson(tasks: List<Task>, categories: List<CategoryEntity>): String {
+        val taskArray = JSONArray()
         tasks.forEach { task ->
             val obj = JSONObject()
                 .put("id", task.id)
@@ -19,19 +25,46 @@ object ExportImportHelper {
                 .put("description", task.description)
                 .put("dueDate", task.dueDate)
                 .put("isCompleted", task.isCompleted)
-                .put("category", task.category)
+                .put("categoryId", task.categoryId)
                 .put("priority", task.priority)
                 .put("reminderEnabled", task.reminderEnabled)
                 .put("createdAt", task.createdAt)
                 .put("repeatInterval", task.repeatInterval)
                 .put("tags", task.tags)
-            array.put(obj)
+            taskArray.put(obj)
         }
-        return JSONObject().put("tasks", array).toString(2)
+        val categoryArray = JSONArray()
+        categories.forEach { category ->
+            val obj = JSONObject()
+                .put("id", category.id)
+                .put("name", category.name)
+                .put("icon", category.icon)
+                .put("color", category.color)
+            categoryArray.put(obj)
+        }
+        return JSONObject()
+            .put("tasks", taskArray)
+            .put("categories", categoryArray)
+            .toString(2)
     }
 
-    fun importFromJson(json: String): List<Task> {
+    fun importFromJson(json: String): ImportResult {
         val root = JSONObject(json)
+        val categories = mutableListOf<CategoryEntity>()
+        if (root.has("categories")) {
+            val categoryArray = root.getJSONArray("categories")
+            for (i in 0 until categoryArray.length()) {
+                val obj = categoryArray.getJSONObject(i)
+                categories.add(
+                    CategoryEntity(
+                        id = obj.optInt("id", 0),
+                        name = obj.optString("name", ""),
+                        icon = obj.optString("icon", CategoryEntity.DEFAULT_ICON),
+                        color = obj.optInt("color", CategoryEntity.DEFAULT_COLOR)
+                    )
+                )
+            }
+        }
         val array = root.getJSONArray("tasks")
         val tasks = mutableListOf<Task>()
         for (i in 0 until array.length()) {
@@ -43,7 +76,7 @@ object ExportImportHelper {
                     description = obj.optString("description", ""),
                     dueDate = obj.optLong("dueDate", 0L),
                     isCompleted = obj.optBoolean("isCompleted", false),
-                    category = obj.optString("category", "GENERAL"),
+                    categoryId = obj.optInt("categoryId", CategoryEntity.ID_GENERAL),
                     priority = obj.optInt("priority", 1),
                     reminderEnabled = obj.optBoolean("reminderEnabled", false),
                     createdAt = obj.optLong("createdAt", System.currentTimeMillis()),
@@ -53,18 +86,19 @@ object ExportImportHelper {
                 )
             )
         }
-        return tasks.filter { it.title.isNotBlank() }
+        return ImportResult(tasks.filter { it.title.isNotBlank() }, categories)
     }
 
     fun exportToCsv(tasks: List<Task>): String {
-        val header = "title,description,dueDate,isCompleted,category,priority,reminderEnabled,tags"
+        val header =
+            "title,description,dueDate,isCompleted,categoryId,priority,reminderEnabled,tags"
         val rows = tasks.joinToString("\n") { task ->
             listOf(
                 escapeCsv(task.title),
                 escapeCsv(task.description),
                 task.dueDate.toString(),
                 task.isCompleted.toString(),
-                task.category,
+                task.categoryId.toString(),
                 task.priority.toString(),
                 task.reminderEnabled.toString(),
                 escapeCsv(task.tags)

@@ -200,6 +200,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/category_personal" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_category_new"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/new_category"
+                    app:chipIcon="@drawable/ic_add" />
             </com.google.android.material.chip.ChipGroup>
 
             <TextView

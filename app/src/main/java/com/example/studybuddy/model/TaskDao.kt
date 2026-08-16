@@ -35,11 +35,11 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE priority = :priority ORDER BY is_completed ASC, due_date ASC")
     fun getTasksByPriority(priority: Int): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE category = :category ORDER BY is_completed ASC, due_date ASC")
-    fun getTasksByCategory(category: String): Flow<List<Task>>
+    @Query("SELECT * FROM tasks WHERE category_id = :categoryId ORDER BY is_completed ASC, due_date ASC")
+    fun getTasksByCategory(categoryId: Int): Flow<List<Task>>
 
-    @Query("SELECT * FROM tasks WHERE category = :category AND priority = :priority ORDER BY is_completed ASC, due_date ASC")
-    fun getTasksByCategoryAndPriority(category: String, priority: Int): Flow<List<Task>>
+    @Query("SELECT * FROM tasks WHERE category_id = :categoryId AND priority = :priority ORDER BY is_completed ASC, due_date ASC")
+    fun getTasksByCategoryAndPriority(categoryId: Int, priority: Int): Flow<List<Task>>
 
     @Query("SELECT * FROM tasks WHERE (',' || tags || ',') LIKE '%,' || :tag || ',%' ORDER BY is_completed ASC, due_date ASC")
     fun getTasksByTag(tag: String): Flow<List<Task>>

@@ -65,12 +65,19 @@
     <string name="select_date_time_warning">Please select a valid date and time</string>
     <string name="past_date_warning">The selected date has passed. Save anyway?</string>
     <string name="yes">Yes</string>
+    <string name="delete">Delete</string>
 
     <!-- Categories -->
     <string name="category_general">General</string>
     <string name="category_study">Study</string>
     <string name="category_work">Work</string>
     <string name="category_personal">Personal</string>
+    <string name="new_category">New category</string>
+    <string name="category_name_hint">Category name</string>
+    <string name="category_name_required">Enter the category name</string>
+    <string name="category_icon_label">Choose an icon</string>
+    <string name="delete_category_title">Delete category</string>
+    <string name="delete_category_message">The category "%1$s" will be deleted and its tasks will move to "General". Continue?</string>
 
     <!-- Detail -->
     <string name="detail_title">Task details</string>

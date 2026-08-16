@@ -4,7 +4,8 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 
 ## Características
 
-- **Gestión de tareas** con título, descripción, fecha/hora, categoría (General, Estudio, Trabajo, Personal) y prioridad (Alta, Media, Baja).
+- **Gestión de tareas** con título, descripción, fecha/hora, categoría y prioridad (Alta, Media, Baja).
+- **Categorías personalizables**: 4 por defecto (General, Estudio, Trabajo, Personal) con icono y color, más categorías propias creadas desde la app (8 iconos, paleta de colores) y borrado con reasignación automática de tareas a General.
 - **Tareas recurrentes** (diarias/semanales) que se reprograman automáticamente al completarse.
 - **Subtareas** con cascada al eliminar la tarea padre.
 - **Etiquetas** (tags) con filtro por chips.
@@ -24,7 +25,7 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 
 - Kotlin 2.0, corrutinas y Flow
 - ViewBinding
-- Room 2.6 (migraciones v1→v2→v3 versionadas)
+- Room 2.6 (migraciones v1→v2→v3→v4 versionadas)
 - Material Components 3, temas con Material You
 - AlarmManager + WorkManager + notificaciones
 - App Widgets (RemoteViewsService)
@@ -42,7 +43,7 @@ app/src/main/java/com/example/studybuddy/
 ├── StatisticsActivity.kt    # Estadísticas y gráfico
 ├── adapter/                 # TaskAdapter, SubTaskAdapter
 ├── data/                    # ServiceLocator, TaskRepository (Flow)
-├── model/                   # Task, SubTask, DAOs, AppDatabase + migraciones
+├── model/                   # Task, SubTask, CategoryEntity, DAOs, AppDatabase + migraciones
 ├── notification/            # AlarmReceiver, AlarmManagerHelper, NotificationHelper, DailyOverdueWorker
 ├── ui/                      # TaskViewModel (Flow + LiveData)
 ├── util/                    # DateUtils, ExportImportHelper, BackupHelper, FocusSessionStore
@@ -64,7 +65,7 @@ app/src/main/java/com/example/studybuddy/
 ./gradlew connectedDebugAndroidTest  # tests de instrumentación (migraciones Room)
 ```
 
-Los tests de migración validan las rutas v1→v3 y v2→v3 usando los esquemas exportados en `app/schemas/`.
+Los tests de migración validan las rutas v1→v4, v2→v4 y v3→v4 usando los esquemas exportados en `app/schemas/`.
 
 ## CI
 

@@ -65,12 +65,19 @@
     <string name="select_date_time_warning">Selecciona una fecha y hora válidas</string>
     <string name="past_date_warning">La fecha seleccionada ya pasó. ¿Guardar de todos modos?</string>
     <string name="yes">Sí</string>
+    <string name="delete">Eliminar</string>
 
     <!-- Categorías -->
     <string name="category_general">General</string>
     <string name="category_study">Estudio</string>
     <string name="category_work">Trabajo</string>
     <string name="category_personal">Personal</string>
+    <string name="new_category">Nueva categoría</string>
+    <string name="category_name_hint">Nombre de la categoría</string>
+    <string name="category_name_required">Escribe el nombre de la categoría</string>
+    <string name="category_icon_label">Elige un icono</string>
+    <string name="delete_category_title">Eliminar categoría</string>
+    <string name="delete_category_message">Se eliminará la categoría "%1$s" y sus tareas pasarán a "General". ¿Continuar?</string>
 
     <!-- Detalle -->
     <string name="detail_title">Detalle de la tarea</string>

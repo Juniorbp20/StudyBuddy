@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ActivityOptions
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,18 +27,20 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.studybuddy.adapter.TaskAdapter
 import com.example.studybuddy.databinding.ActivityMainBinding
-import com.example.studybuddy.model.Category
+import com.example.studybuddy.model.CategoryEntity
 import com.example.studybuddy.model.Priority
 import com.example.studybuddy.model.Task
+import com.example.studybuddy.model.categoryIconRes
+import com.example.studybuddy.model.displayName
 import com.example.studybuddy.notification.AlarmManagerHelper
 import com.example.studybuddy.notification.DailyOverdueWorker
 import com.example.studybuddy.ui.TaskViewModel
 import com.example.studybuddy.util.BackupHelper
 import com.example.studybuddy.util.ExportImportHelper
 import com.google.android.material.chip.Chip
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.color.DynamicColors
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
@@ -47,7 +51,7 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
     private lateinit var alarmHelper: AlarmManagerHelper
 
     private var lastTasks: List<Task> = emptyList()
-    private var selectedCategory: String? = null
+    private var selectedCategory: Int? = null
     private var selectedPriority: Int? = null
     private var selectedTag: String? = null
 
@@ -66,8 +70,9 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
         registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
             if (uri != null) {
                 val tasks = taskViewModel.allTasks.value ?: emptyList()
+                val categories = taskViewModel.categories.value ?: emptyList()
                 val success = ExportImportHelper.writeToUri(
-                    this, uri, ExportImportHelper.exportToJson(tasks)
+                    this, uri, ExportImportHelper.exportToJson(tasks, categories)
                 )
                 showExportResult(success, tasks.size)
             }
@@ -89,22 +94,33 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
             if (uri != null) {
                 val json = ExportImportHelper.readFromUri(this, uri)
                 if (json != null) {
-                    val tasks = ExportImportHelper.importFromJson(json)
-                    tasks.forEach { task ->
-                        taskViewModel.insert(task) { id ->
-                            if (task.reminderEnabled && task.dueDate > System.currentTimeMillis()) {
-                                alarmHelper.setAlarm(
-                                    id.toInt(), task.title, task.description,
-                                    task.dueDate, task.repeatInterval
-                                )
+                    val result = ExportImportHelper.importFromJson(json)
+                    lifecycleScope.launch {
+                        val idMap = mutableMapOf<Int, Int>()
+                        result.categories.forEach { category ->
+                            idMap[category.id] = taskViewModel.upsertCategoryNow(category)
+                        }
+                        result.tasks.forEach { task ->
+                            val mapped = idMap[task.categoryId]?.let {
+                                task.copy(categoryId = it)
+                            } ?: task
+                            taskViewModel.insert(mapped) { id ->
+                                if (mapped.reminderEnabled &&
+                                    mapped.dueDate > System.currentTimeMillis()
+                                ) {
+                                    alarmHelper.setAlarm(
+                                        id.toInt(), mapped.title, mapped.description,
+                                        mapped.dueDate, mapped.repeatInterval
+                                    )
+                                }
                             }
                         }
+                        Toast.makeText(
+                            this@MainActivity,
+                            getString(R.string.import_success, result.tasks.size),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    Toast.makeText(
-                        this,
-                        getString(R.string.import_success, tasks.size),
-                        Toast.LENGTH_SHORT
-                    ).show()
                 } else {
                     Toast.makeText(this, R.string.import_error, Toast.LENGTH_SHORT).show()
                 }
@@ -181,21 +197,8 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
                 taskViewModel.setCategoryFilter(null)
             }
         }
-        Category.ALL.forEach { category ->
-            val chip = Chip(this).apply {
-                text = when (category) {
-                    Category.STUDY -> getString(R.string.category_study)
-                    Category.WORK -> getString(R.string.category_work)
-                    Category.PERSONAL -> getString(R.string.category_personal)
-                    else -> getString(R.string.category_general)
-                }
-                isCheckable = true
-                setOnCheckedChangeListener { _, isChecked ->
-                    selectedCategory = if (isChecked) category else null
-                    taskViewModel.setCategoryFilter(selectedCategory)
-                }
-            }
-            binding.chipGroupCategory.addView(chip)
+        taskViewModel.categories.observe(this) { categories ->
+            renderCategoryChips(categories)
         }
 
         binding.chipPriorityAll.setOnCheckedChangeListener { _, isChecked ->
@@ -225,6 +228,44 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
 
         taskViewModel.availableTags.observe(this) { tags ->
             renderTagChips(tags)
+        }
+    }
+
+    private fun renderCategoryChips(categories: List<CategoryEntity>) {
+        val existing = mutableMapOf<Int, Chip>()
+        for (i in 0 until binding.chipGroupCategory.childCount) {
+            val chip = binding.chipGroupCategory.getChildAt(i) as? Chip ?: continue
+            val id = chip.tag as? Int ?: continue
+            existing[id] = chip
+        }
+        val seen = mutableSetOf<Int>()
+        categories.forEach { category ->
+            seen.add(category.id)
+            val chip = existing[category.id]
+            if (chip != null) {
+                if (chip.text != category.displayName(this)) {
+                    chip.text = category.displayName(this)
+                }
+                return@forEach
+            }
+            val iconRes = category.icon.categoryIconRes() ?: R.drawable.ic_cat_star
+            val newChip = Chip(this).apply {
+                tag = category.id
+                text = category.displayName(this@MainActivity)
+                chipIcon = ContextCompat.getDrawable(this@MainActivity, iconRes)
+                chipIconTint = ColorStateList.valueOf(category.color)
+                isCheckable = true
+                setOnCheckedChangeListener { _, isChecked ->
+                    selectedCategory = if (isChecked) category.id else null
+                    taskViewModel.setCategoryFilter(selectedCategory)
+                }
+            }
+            binding.chipGroupCategory.addView(newChip)
+        }
+        existing.forEach { (id, chip) ->
+            if (id !in seen) {
+                binding.chipGroupCategory.removeView(chip)
+            }
         }
     }
 
@@ -292,6 +333,9 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
             binding.textViewEmpty.isVisible = tasks.isNullOrEmpty()
             binding.recyclerViewTasks.isVisible = !tasks.isNullOrEmpty()
             binding.recyclerViewTasks.scheduleLayoutAnimation()
+        }
+        taskViewModel.categories.observe(this) { categories ->
+            adapter.updateCategories(categories)
         }
     }
 

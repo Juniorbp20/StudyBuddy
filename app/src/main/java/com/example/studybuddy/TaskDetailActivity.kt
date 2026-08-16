@@ -10,9 +10,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.studybuddy.adapter.SubTaskAdapter
 import com.example.studybuddy.databinding.ActivityTaskDetailBinding
-import com.example.studybuddy.model.Category
 import com.example.studybuddy.model.Priority
 import com.example.studybuddy.model.SubTask
+import com.example.studybuddy.model.categoryIconRes
+import com.example.studybuddy.model.displayName
 import com.example.studybuddy.notification.AlarmManagerHelper
 import com.example.studybuddy.ui.TaskViewModel
 import com.example.studybuddy.util.DateUtils
@@ -97,16 +98,34 @@ class TaskDetailActivity : AppCompatActivity() {
             binding.textTitle.text = task.title
             binding.textDescription.text = task.description.ifBlank { "Sin descripción" }
             binding.textDate.text = DateUtils.formatFull(task.dueDate)
-            binding.textCategory.text = categoryLabel(task.category)
+            renderCategory(task)
             binding.textPriority.text = priorityLabel(task.priority)
             binding.textTags.text = task.tags.ifBlank { "Sin etiquetas" }
             binding.checkboxComplete.isChecked = task.isCompleted
             binding.textReminder.text = if (task.reminderEnabled) "Recordatorio activado" else "Sin recordatorio"
         }
+        taskViewModel.categories.observe(this) { categories ->
+            taskViewModel.allTasks.value?.firstOrNull { it.id == taskId }?.let { task ->
+                renderCategory(task)
+            }
+        }
         taskViewModel.subtasksForTask(taskId).observe(this) { subTasks ->
             subTaskAdapter.submitList(subTasks)
             binding.textViewEmptySubtasks.isVisible = subTasks.isEmpty()
         }
+    }
+
+    private fun renderCategory(task: com.example.studybuddy.model.Task) {
+        val category = (taskViewModel.categories.value ?: emptyList())
+            .firstOrNull { it.id == task.categoryId }
+        binding.textCategory.text = category?.displayName(this)
+            ?: getString(R.string.category_general)
+        binding.imageCategory.setImageResource(
+            category?.icon?.categoryIconRes() ?: R.drawable.ic_cat_star
+        )
+        binding.imageCategory.setColorFilter(
+            category?.color ?: com.example.studybuddy.model.CategoryEntity.DEFAULT_COLOR
+        )
     }
 
     private fun addSubTask() {
@@ -117,13 +136,6 @@ class TaskDetailActivity : AppCompatActivity() {
         }
         taskViewModel.insertSubTask(SubTask(taskId = taskId, title = title))
         binding.editTextSubtask.text?.clear()
-    }
-
-    private fun categoryLabel(category: String): String = when (category) {
-        Category.STUDY -> "Estudio"
-        Category.WORK -> "Trabajo"
-        Category.PERSONAL -> "Personal"
-        else -> "General"
     }
 
     private fun priorityLabel(priority: Int): String = when (priority) {

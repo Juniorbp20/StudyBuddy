@@ -21,8 +21,8 @@ data class Task(
     @ColumnInfo(name = "is_completed")
     val isCompleted: Boolean = false,
 
-    @ColumnInfo(name = "category")
-    val category: String = Category.GENERAL,
+    @ColumnInfo(name = "category_id")
+    val categoryId: Int = CategoryEntity.ID_GENERAL,
 
     @ColumnInfo(name = "priority")
     val priority: Int = Priority.MEDIUM,
@@ -42,15 +42,6 @@ data class Task(
     @ColumnInfo(name = "tags")
     val tags: String = ""
 )
-
-object Category {
-    const val GENERAL = "GENERAL"
-    const val STUDY = "STUDY"
-    const val WORK = "WORK"
-    const val PERSONAL = "PERSONAL"
-
-    val ALL = listOf(GENERAL, STUDY, WORK, PERSONAL)
-}
 
 object RepeatInterval {
     const val NONE = 0

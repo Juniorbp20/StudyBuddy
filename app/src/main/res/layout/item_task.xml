@@ -13,11 +13,12 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
-        <View
-            android:id="@+id/view_category_color"
-            android:layout_width="6dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_category_dot"
+        <ImageView
+            android:id="@+id/image_category"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="Categoría"
+            android:src="@drawable/ic_cat_star"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/view_category_color"
+            app:layout_constraintStart_toEndOf="@+id/image_category"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

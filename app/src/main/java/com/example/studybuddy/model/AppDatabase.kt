@@ -8,14 +8,15 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [Task::class, SubTask::class],
-    version = 3,
+    entities = [Task::class, SubTask::class, CategoryEntity::class],
+    version = 4,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TaskDao
     abstract fun subTaskDao(): SubTaskDao
+    abstract fun categoryDao(): CategoryDao
 
     companion object {
         private const val DB_NAME = "task_database"
@@ -85,6 +86,52 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS categories (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "name TEXT NOT NULL, " +
+                        "icon TEXT NOT NULL DEFAULT 'ic_cat_star', " +
+                        "color INTEGER NOT NULL DEFAULT 0)"
+                )
+                db.execSQL(
+                    "INSERT INTO categories (id, name, icon, color) VALUES " +
+                        "(1, 'general', 'ic_cat_star', 0xFF607D8B), " +
+                        "(2, 'study', 'ic_cat_book', 0xFF3F51B5), " +
+                        "(3, 'work', 'ic_cat_briefcase', 0xFFF57C00), " +
+                        "(4, 'personal', 'ic_cat_home', 0xFF00897B)"
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS tasks_new (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "title TEXT NOT NULL, " +
+                        "description TEXT NOT NULL, " +
+                        "due_date INTEGER NOT NULL DEFAULT 0, " +
+                        "is_completed INTEGER NOT NULL DEFAULT 0, " +
+                        "category_id INTEGER NOT NULL DEFAULT 1, " +
+                        "priority INTEGER NOT NULL DEFAULT 1, " +
+                        "reminder_enabled INTEGER NOT NULL DEFAULT 0, " +
+                        "created_at INTEGER NOT NULL DEFAULT 0, " +
+                        "completed_at INTEGER NOT NULL DEFAULT 0, " +
+                        "repeat_interval INTEGER NOT NULL DEFAULT 0, " +
+                        "tags TEXT NOT NULL DEFAULT '')"
+                )
+                db.execSQL(
+                    "INSERT INTO tasks_new (id, title, description, due_date, is_completed, " +
+                        "category_id, priority, reminder_enabled, created_at, completed_at, " +
+                        "repeat_interval, tags) " +
+                        "SELECT id, title, description, due_date, is_completed, " +
+                        "CASE category WHEN 'STUDY' THEN 2 WHEN 'WORK' THEN 3 " +
+                        "WHEN 'PERSONAL' THEN 4 ELSE 1 END, " +
+                        "priority, reminder_enabled, created_at, completed_at, " +
+                        "repeat_interval, tags FROM tasks"
+                )
+                db.execSQL("DROP TABLE tasks")
+                db.execSQL("ALTER TABLE tasks_new RENAME TO tasks")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -92,7 +139,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DB_NAME
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                     .also { INSTANCE = it }
             }
