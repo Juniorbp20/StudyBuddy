@@ -70,10 +70,12 @@ dependencies {
     implementation(libs.splashscreen)
     implementation(libs.coroutines.android)
     implementation(libs.work.runtime)
+    implementation("com.google.android.gms:play-services-ads:24.2.0")
 
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
     implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.process)
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
