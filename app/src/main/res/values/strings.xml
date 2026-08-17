@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Study Buddy</string>
+    <string name="app_name">Compañero de Estudios</string>
 
     <!-- General -->
     <string name="action_add_task">Agregar nueva tarea</string>
@@ -9,7 +9,7 @@
     <string name="save">Guardar</string>
 
     <!-- Main -->
-    <string name="main_title">Study Buddy</string>
+    <string name="main_title">Compañero de Estudios</string>
     <string name="search_hint">Buscar tareas...</string>
     <string name="filter_all_categories">Todas</string>
     <string name="filter_all_priorities">Toda prioridad</string>
@@ -49,10 +49,10 @@
     <string name="update_downloading">Descargando actualización…</string>
     <string name="update_download_error">No se pudo descargar la actualización</string>
     <string name="update_install_permission_title">Instalar desde orígenes desconocidos</string>
-    <string name="update_install_permission_message">Para instalar la actualización, permite a Study Buddy instalar aplicaciones.</string>
+    <string name="update_install_permission_message">Para instalar la actualización, permite a Compañero de Estudios instalar aplicaciones.</string>
     <string name="update_install_permission_action">Abrir ajustes</string>
     <string name="menu_about">Acerca de</string>
-    <string name="about_message">Study Buddy %1$s\nGestor de tareas, hábitos y pomodoro.\nhttps://github.com/Juniorbp20/StudyBuddy</string>
+    <string name="about_message">Compañero de Estudios %1$s\nGestor de tareas, hábitos y pomodoro.\nhttps://github.com/Juniorbp20/StudyBuddy</string>
     <string name="ok">OK</string>
 
     <!-- Add/Edit task -->
