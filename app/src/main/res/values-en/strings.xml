@@ -51,6 +51,9 @@
     <string name="update_install_permission_title">Install unknown apps</string>
     <string name="update_install_permission_message">To install the update, allow Study Buddy to install applications.</string>
     <string name="update_install_permission_action">Open settings</string>
+    <string name="menu_about">About</string>
+    <string name="about_message">Study Buddy %1$s\nTask, habit and pomodoro manager.\nhttps://github.com/Juniorbp20/StudyBuddy</string>
+    <string name="ok">OK</string>
 
     <!-- Add/Edit task -->
     <string name="add_task_title">Add Task</string>

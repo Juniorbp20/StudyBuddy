@@ -51,6 +51,9 @@
     <string name="update_install_permission_title">Instalar desde orígenes desconocidos</string>
     <string name="update_install_permission_message">Para instalar la actualización, permite a Study Buddy instalar aplicaciones.</string>
     <string name="update_install_permission_action">Abrir ajustes</string>
+    <string name="menu_about">Acerca de</string>
+    <string name="about_message">Study Buddy %1$s\nGestor de tareas, hábitos y pomodoro.\nhttps://github.com/Juniorbp20/StudyBuddy</string>
+    <string name="ok">OK</string>
 
     <!-- Add/Edit task -->
     <string name="add_task_title">Agregar Tarea</string>

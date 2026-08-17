@@ -527,6 +527,14 @@ class MainActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
                 checkForUpdates()
                 true
             }
+            R.id.action_about -> {
+                MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.app_name)
+                    .setMessage(getString(R.string.about_message, BuildConfig.VERSION_NAME))
+                    .setPositiveButton(R.string.ok, null)
+                    .show()
+                true
+            }
             R.id.action_theme_system -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
                 true
