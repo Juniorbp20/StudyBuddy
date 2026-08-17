@@ -50,9 +50,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="-140dp"
+            android:clickable="true"
+            android:focusable="true"
             android:text="25:00"
             android:textSize="56sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_time_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/focus_time_hint"
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/button_toggle"

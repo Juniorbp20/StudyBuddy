@@ -140,6 +140,10 @@
     <string name="focus_sessions_label">Sesiones hoy: %1$d · Total: %2$d</string>
     <string name="focus_completed_toast">¡Sesión completada! Tómate un descanso</string>
     <string name="focus_break_toast">Descanso terminado. ¡A concentrarse!</string>
+    <string name="focus_time_hint">Toca el tiempo para configurarlo</string>
+    <string name="focus_work_duration_title">Duración de Enfoque (minutos)</string>
+    <string name="focus_break_duration_title">Duración de Descanso (minutos)</string>
+    <string name="focus_pause_to_change">Pausa el temporizador para cambiar el tiempo</string>
 
     <!-- Export/Import -->
     <string name="export_success">Tareas exportadas (%1$d)</string>

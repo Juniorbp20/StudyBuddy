@@ -140,6 +140,10 @@
     <string name="focus_sessions_label">Sessions today: %1$d · Total: %2$d</string>
     <string name="focus_completed_toast">Session completed! Take a break</string>
     <string name="focus_break_toast">Break over. Focus time!</string>
+    <string name="focus_time_hint">Tap the time to set it</string>
+    <string name="focus_work_duration_title">Focus duration (minutes)</string>
+    <string name="focus_break_duration_title">Break duration (minutes)</string>
+    <string name="focus_pause_to_change">Pause the timer to change the time</string>
 
     <!-- Export/Import -->
     <string name="export_success">Exported %1$d tasks</string>
