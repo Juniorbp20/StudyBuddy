@@ -12,8 +12,8 @@ android {
         applicationId = "com.example.studybuddy"
         minSdk = 23
         targetSdk = 36
-        versionCode = 6
-        versionName = "6"
+        versionCode = 7
+        versionName = "7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
