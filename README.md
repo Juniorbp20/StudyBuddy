@@ -77,7 +77,9 @@ Los tests de migración validan las rutas v1→v4, v2→v4 y v3→v4 usando los 
 
 1. Sube el `versionCode` y `versionName` en `app/build.gradle.kts`.
 2. Crea y sube un tag con el mismo número: `git tag v5 && git push origin v5`.
-3. El CD genera la release; la app la detecta en "Buscar actualizaciones" (el APK de release se firma con el keystore de debug).
+3. El CD genera la release; la app la detecta en "Buscar actualizaciones".
+
+El APK se firma con el keystore versionado en `keystore/studybuddy.jks` (alias/contraseña: `studybuddy`), el mismo que usan los builds de debug, por lo que la actualización se instala sobre cualquier instalación previa.
 
 ## Licencia
 

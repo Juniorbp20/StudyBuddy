@@ -18,14 +18,26 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("studybuddy") {
+            storeFile = rootProject.file("keystore/studybuddy.jks")
+            storePassword = "studybuddy"
+            keyAlias = "studybuddy"
+            keyPassword = "studybuddy"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("studybuddy")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("studybuddy")
         }
     }
     compileOptions {
