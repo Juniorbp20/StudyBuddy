@@ -1,4 +1,4 @@
-# Study Buddy
+# Compañero de Estudios
 
 Aplicación Android de gestión de tareas y hábitos de estudio, construida con **Kotlin + Views (XML)** y **Material 3**.
 
@@ -13,13 +13,14 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 - **Recordatorios** con notificaciones y canales dedicados (requiere permiso de notificaciones y alarmas exactas).
 - **Resumen diario de tareas vencidas** vía WorkManager.
 - **Calendario mensual** con indicador visual de días con tareas pendientes.
-- **Modo enfoque (Pomodoro)** de 25 min con descanso, vibración y registro de sesiones.
+- **Modo enfoque (Pomodoro)** con duración configurable (Enfoque y Descanso en minutos, persistida), vibración y registro de sesiones.
 - **Estadísticas**: progreso de completado, resumen (total, completadas, pendientes, vencidas, hoy, última semana), gráfico de los últimos 7 días y sesiones de enfoque.
 - **Widget de escritorio** "Tareas de hoy" con lista actualizable.
 - **Exportar/importar** tareas en JSON y CSV.
 - **Tema oscuro y Material You** (colores dinámicos en Android 12+), tema claro/oscuro/sistema desde el menú.
 - **Deshacer** al eliminar tareas (snackbar).
 - **Actualizaciones desde GitHub Releases**: menú → "Buscar actualizaciones" compara la versión instalada con la última release del CD y descarga/instala el APK (requiere permiso "instalar desde orígenes desconocidos").
+- **Anuncio de inicio (App Open Ad de AdMob)**: se muestra al volver a la app desde segundo plano; se omite en el primer arranque (política de AdMob). En builds de debug se usa el ID de prueba de Google; en release, la unidad real.
 - **Multilingüe**: español (es) e inglés (en).
 
 ## Tecnologías
@@ -30,6 +31,7 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 - Material Components 3, temas con Material You
 - AlarmManager + WorkManager + notificaciones
 - App Widgets (RemoteViewsService)
+- Google Mobile Ads (App Open Ad, `play-services-ads` 24.2.0)
 - Splash Screen API (androidx.core)
 
 ## Estructura
@@ -37,6 +39,7 @@ Aplicación Android de gestión de tareas y hábitos de estudio, construida con 
 ```
 app/src/main/java/com/example/studybuddy/
 ├── MainActivity.kt          # Lista principal: búsqueda, filtros, chips, swipe, undo
+├── App.kt                   # Application: inicialización AdMob + anuncio de inicio
 ├── AddTaskActivity.kt       # Crear/editar tarea
 ├── TaskDetailActivity.kt    # Detalle + subtareas
 ├── CalendarActivity.kt      # Calendario mensual
